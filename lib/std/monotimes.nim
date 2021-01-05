@@ -99,6 +99,10 @@ proc getMonoTime*(): MonoTime {.tags: [TimeEffect].} =
     mach_timebase_info(machAbsoluteTimeFreq)
     result = MonoTime(ticks: ticks * machAbsoluteTimeFreq.numer div
       machAbsoluteTimeFreq.denom)
+  elif defined(atari):
+    # MiNTLib does not have clock_gettime
+    let ts = clock()
+    result = MonoTime(ticks: int64(float(ts) * (1_000_000_000 / CLOCKS_PER_SEC)))
   elif defined(posix):
     var ts: Timespec
     discard clock_gettime(CLOCK_MONOTONIC, ts)

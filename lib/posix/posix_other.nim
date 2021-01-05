@@ -629,6 +629,10 @@ elif defined(freertos) or defined(lwip):
   # LwIP/FreeRTOS doesn't have MSG_NOSIGNAL
   const
     MSG_NOSIGNAL* = 0x20'i32
+elif defined(atari):
+  # MiNTLib doesn't have MSG_NOSIGNAL
+  const
+    MSG_NOSIGNAL* = 0'i32
 else:
   var
     MSG_NOSIGNAL* {.importc, header: "<sys/socket.h>".}: cint
