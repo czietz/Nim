@@ -1,0 +1,1 @@
+injectDestructorCalls	injectdestructors.html#injectDestructorCalls,ModuleGraph,IdGenerator,PSym,PNode	injectdestructors: injectDestructorCalls(g: ModuleGraph; idgen: IdGenerator; owner: PSym; n: PNode): PNode	
