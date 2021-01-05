@@ -353,7 +353,7 @@ type
     sched_ss_max_repl*: cint         ## Maximum pending replenishments for
                                      ## sporadic server.
 
-  Timeval* {.importc: "struct timeval", header: "<sys/select.h>",
+  Timeval* {.importc: "struct timeval", header: "<sys/time.h>",
              final, pure.} = object ## struct timeval
     tv_sec*: Time ## Seconds.
     tv_usec*: Suseconds ## Microseconds.
