@@ -778,7 +778,7 @@ when declared(stdout):
 
   const stdOutLock = not defined(windows) and not defined(android) and
                      not defined(nintendoswitch) and not defined(freertos) and
-                     hostOS != "any"
+                     not defined(atari) and hostOS != "any"
 
   proc echoBinSafe(args: openArray[string]) {.compilerproc.} =
     when defined(androidNDK):
