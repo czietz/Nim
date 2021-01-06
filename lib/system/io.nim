@@ -348,7 +348,11 @@ when defined(nimdoc) or (defined(posix) and not defined(nimscript)) or defined(w
     elif defined(posix):
       var flags = c_fcntl(f, F_GETFD)
       if flags == -1:
-        return false
+        when defined(atari):
+          # MiNTLib only supports Fcntl when running under MiNT, not under TOS; hence do not fail here
+          return true
+        else:
+          return false
       flags = if inheritable: flags and not FD_CLOEXEC else: flags or FD_CLOEXEC
       result = c_fcntl(f, F_SETFD, flags) != -1
     else:
