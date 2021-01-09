@@ -191,6 +191,70 @@ elif defined(nintendoswitch) and not defined(StandaloneHeapSize):
     when reallyOsDealloc:
       freeMem(p)
 
+elif defined(atari) and not defined(StandaloneHeapSize):
+
+  # Atari TOS has no API to request *aligned* memory.
+  # Memory allocated by Malloc is only guaranteed to start
+  # at an even address. Therefore, enough memory is allocated
+  # so that the returned block can always be aligned properly.
+  # This implies that the real start of the allocated
+  # memory needs to be stored for calls to Mfree.
+
+  type
+    PAtariMemory = ptr AtariMemory
+    AtariMemory {.pure, inheritable.} = object
+      nimStart:  pointer
+      tosStart: clong            # memory really allocated by Malloc
+      size: int
+
+  proc Malloc(size: clong): clong {.header: "<osbind.h>".}
+  proc Mfree(p: clong): clong     {.header: "<osbind.h>".}
+
+  # Store real start of allocated memory so it can be passed to Mfree
+  proc storeAtariMemoryData(nimStart: pointer, tosStart: clong, size: int) {.inline.} =
+    var data : PAtariMemory = cast[PAtariMemory](cast[ByteAddress](nimStart) + size)
+    #c_printf "storeAtariMemoryData(%p, %lx, %ld)\n", nimStart, tosStart, size
+    data.nimStart = nimStart
+    data.tosStart = tosStart
+    data.size = size
+
+  # Get real start of allocated memory
+  proc getTosStart(nimStart: pointer, size: int): clong {.inline.} =
+    var data : PAtariMemory = cast[PAtariMemory](cast[ByteAddress](nimStart) + size)
+    #c_printf "getTosStart(%p, %ld) = %p, %lx, %ld\n", nimStart, size, data.nimStart, data.tosStart, data.size
+    # Safety check against corrupted data
+    if (data.nimStart == nimStart) and (data.size == size):
+      result = data.tosStart
+    else:
+      result = 0
+
+  # Align memory to PageSize multiples and store data about
+  # memory block.
+  proc alignMemory(tosStart: clong, size: int): pointer {.inline.} =
+    if tosStart > 0:
+      result = cast[pointer](roundup(tosStart, PageSize))
+      storeAtariMemoryData(result, tosStart, size)
+    else:
+      result = nil
+
+  proc osAllocPages(size: int): pointer {.inline.} =
+    let tosStart = Malloc(size+PageSize-2+sizeof(AtariMemory))
+    if tosStart == 0: raiseOutOfMem()
+    result = alignMemory(tosStart, size)
+
+  proc osTryAllocPages(size: int): pointer {.inline.} =
+    let tosStart = Malloc(size+PageSize-2+sizeof(AtariMemory))
+    result = alignMemory(tosStart, size)
+
+  proc osDeallocPages(p: pointer, size: int) {.inline.} =
+    # Note that this assumes that only whole blocks as returned
+    # by osAllocPages/osTryAllocPages are deallocated.
+    # See https://forum.nim-lang.org/t/7355#46619.
+    when reallyOsDealloc:
+      let tosStart = getTosStart(p, size)
+      if tosStart != 0:
+        discard Mfree(tosStart)
+
 elif defined(posix) and not defined(StandaloneHeapSize):
   const
     PROT_READ  = 1             # page can be read
