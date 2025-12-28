@@ -1,0 +1,2 @@
+nimTitle	deps	deps.html	module deps		0
+nim	commandDeps	deps.html#commandDeps,ConfigRef	proc commandDeps(conf: ConfigRef)		302

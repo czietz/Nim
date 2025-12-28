@@ -1,0 +1,21 @@
+nimTitle	ast2nif	ast2nif.html	module ast2nif		0
+nim	toHookIndexEntry	ast2nif.html#toHookIndexEntry,ConfigRef,ItemId,PSym	proc toHookIndexEntry(config: ConfigRef; typeId: ItemId; hookSym: PSym): HookIndexEntry		33
+nim	toConverterIndexEntry	ast2nif.html#toConverterIndexEntry,ConfigRef,PSym	proc toConverterIndexEntry(config: ConfigRef; converterSym: PSym): (nifstreams.SymId,\n    nifstreams.SymId)		44
+nim	toMethodIndexEntry	ast2nif.html#toMethodIndexEntry,ConfigRef,PSym,string	proc toMethodIndexEntry(config: ConfigRef; methodSym: PSym; signature: string): MethodIndexEntry		59
+nim	toClassSymId	ast2nif.html#toClassSymId,ConfigRef,ItemId	proc toClassSymId(config: ConfigRef; typeId: ItemId): nifstreams.SymId		67
+nim	ParsedSymName	ast2nif.html#ParsedSymName	object ParsedSymName		194
+nim	parseSymName	ast2nif.html#parseSymName,string	proc parseSymName(s: string): ParsedSymName		199
+nim	writeNifModule	ast2nif.html#writeNifModule,ConfigRef,int32,PNode,seq[LogEntry],seq[PNode]	proc writeNifModule(config: ConfigRef; thisModule: int32; n: PNode;\n               opsLog: seq[LogEntry]; replayActions: seq[PNode] = @[])		689
+nim	firstSon	ast2nif.html#firstSon,Cursor	proc firstSon(n: Cursor): Cursor		767
+nim	DecodeContext	ast2nif.html#DecodeContext	object DecodeContext		801
+nim	createDecodeContext	ast2nif.html#createDecodeContext,ConfigRef,IdentCache	proc createDecodeContext(config: ConfigRef; cache: IdentCache): DecodeContext		809
+nim	isStub	ast2nif.html#isStub,PType	proc isStub(t: PType): bool		962
+nim	isStub	ast2nif.html#isStub,PSym	proc isStub(s: PSym): bool		963
+nim	loadType	ast2nif.html#loadType,DecodeContext,PType	proc loadType(c: var DecodeContext; t: PType)		1034
+nim	loadSym	ast2nif.html#loadSym,DecodeContext,PSym	proc loadSym(c: var DecodeContext; s: PSym)		1124
+nim	toNifFilename	ast2nif.html#toNifFilename,ConfigRef,FileIndex	proc toNifFilename(conf: ConfigRef; f: FileIndex): string		1404
+nim	toNifIndexFilename	ast2nif.html#toNifIndexFilename,ConfigRef,FileIndex	proc toNifIndexFilename(conf: ConfigRef; f: FileIndex): string		1408
+nim	resolveHookSym	ast2nif.html#resolveHookSym,DecodeContext,	proc resolveHookSym(c: var DecodeContext; symId: nifstreams.SymId): PSym		1438
+nim	tryResolveCompilerProc	ast2nif.html#tryResolveCompilerProc,DecodeContext,string,FileIndex	proc tryResolveCompilerProc(c: var DecodeContext; name: string;\n                       moduleFileIdx: FileIndex): PSym		1444
+nim	loadNifModule	ast2nif.html#loadNifModule,DecodeContext,FileIndex,TStrTable,TStrTable,seq[LogEntry],bool	proc loadNifModule(c: var DecodeContext; f: FileIndex;\n              interf, interfHidden: var TStrTable; logOps: var seq[LogEntry];\n              loadFullAst: bool = false): PNode		1558
+nimgrp	isstub	ast2nif.html#isStub-procs-all	proc		962
