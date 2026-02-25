@@ -392,12 +392,8 @@ else:
             while sp <% regEnd:
               gcMark(gch, cast[PPointer](sp)[])
               sp = sp +% sizeof(pointer)
-        # The ABI for Atari TOS only mandates pointers (32 bit) to be 16(!)-bit-aligned
-        # on the stack. Therefore, we must traverse the stack in 2 byte increments
-        # when scanning for cells to mark.
-        when not defined(atari):
-          # Make sure sp is word-aligned
-          sp = sp and not (sizeof(pointer) - 1)
+        # Make sure sp is word-aligned
+        sp = sp and not (sizeof(pointer) - 1)
         # loop unrolled:
         while sp <% max - 8*sizeof(pointer):
           gcMark(gch, cast[PStackSlice](sp)[0])
@@ -408,27 +404,11 @@ else:
           gcMark(gch, cast[PStackSlice](sp)[5])
           gcMark(gch, cast[PStackSlice](sp)[6])
           gcMark(gch, cast[PStackSlice](sp)[7])
-          when defined(atari):
-            # Increment stack by 2 and rescan
-            sp = sp +% (sizeof(pointer) /% 2)
-            gcMark(gch, cast[PStackSlice](sp)[0])
-            gcMark(gch, cast[PStackSlice](sp)[1])
-            gcMark(gch, cast[PStackSlice](sp)[2])
-            gcMark(gch, cast[PStackSlice](sp)[3])
-            gcMark(gch, cast[PStackSlice](sp)[4])
-            gcMark(gch, cast[PStackSlice](sp)[5])
-            gcMark(gch, cast[PStackSlice](sp)[6])
-            gcMark(gch, cast[PStackSlice](sp)[7])
-            sp = sp +% sizeof(pointer)*8 -% (sizeof(pointer) /% 2)
-          else:
-            sp = sp +% sizeof(pointer)*8
+          sp = sp +% sizeof(pointer)*8
         # last few entries:
         while sp <=% max:
           gcMark(gch, cast[PPointer](sp)[])
-          when defined(atari):
-            sp = sp +% (sizeof(pointer) /% 2)
-          else:
-            sp = sp +% sizeof(pointer)
+          sp = sp +% sizeof(pointer)
 
 # ----------------------------------------------------------------------------
 # end of non-portable code
