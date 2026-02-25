@@ -518,7 +518,7 @@ proc readLine*(f: File, line: var string): bool {.tags: [ReadIOEffect],
       fgetsSuccess = c_fgets(cast[cstring](beginStore(line, pos + sp, pos)), sp.cint, f) != nil
       endStore(line)
       if fgetsSuccess: break
-      when not defined(nimscript):
+      when (not defined(nimscript)) and (not defined(libcmini)):
         if errno == EINTR:
           errno = 0
           c_clearerr(f)
