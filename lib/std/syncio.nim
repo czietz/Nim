@@ -501,7 +501,7 @@ proc readLine*(f: File, line: var string): bool {.tags: [ReadIOEffect],
       # likely other io procs need this for correctness.
       fgetsSuccess = c_fgets(cast[cstring](addr line[pos]), sp.cint, f) != nil
       if fgetsSuccess: break
-      when not defined(nimscript):
+      when (not defined(nimscript)) and (not defined(libcmini)):
         if errno == EINTR:
           errno = 0
           c_clearerr(f)
