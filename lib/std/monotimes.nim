@@ -105,6 +105,10 @@ proc getMonoTime*(): MonoTime {.tags: [TimeEffect].} =
   elif defined(zephyr):
     let ticks = k_ticks_to_ns_floor64(k_uptime_ticks())
     result = MonoTime(ticks: ticks)
+  elif defined(atari):
+    # MiNTLib does not have clock_gettime
+    let ts = clock()
+    result = MonoTime(ticks: int64(float(ts) * (1_000_000_000 / CLOCKS_PER_SEC)))
   elif defined(posix):
     var ts: Timespec = default(Timespec)
     discard clock_gettime(CLOCK_MONOTONIC, ts)
