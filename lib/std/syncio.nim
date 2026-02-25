@@ -116,7 +116,7 @@ when not declared(c_fwrite):
 # C routine that is used here:
 proc c_fread(buf: pointer, size, n: csize_t, f: File): csize_t {.
   importc: "fread", header: "<stdio.h>", tags: [ReadIOEffect].}
-when defined(windows):
+when defined(windows) or (defined(atari) and defined(libcmini)):
   when not defined(amd64):
     proc c_fseek(f: File, offset: int64, whence: cint): cint {.
       importc: "fseek", header: "<stdio.h>", tags: [].}
@@ -282,9 +282,16 @@ when defined(nimscript):
       IOFBF = cint(0)
       IONBF = cint(2)
 else:
-  var
-    IOFBF {.importc: "_IOFBF", nodecl.}: cint
-    IONBF {.importc: "_IONBF", nodecl.}: cint
+  when defined(atari) and defined(libcmini):
+    # IOFBF, IONBF not defined for libcmini on Atari TOS.
+    # setvbuf() doesn't do anything, either, so values are arbitrary.
+    const
+      IOFBF = cint(0)
+      IONBF = cint(2)
+  else:
+    var
+      IOFBF {.importc: "_IOFBF", nodecl.}: cint
+      IONBF {.importc: "_IONBF", nodecl.}: cint
 
 when defined(posix) and not defined(nimscript):
   # Not part of the `SupportIoctlInheritCtl` branches below: `open` needs
@@ -389,6 +396,9 @@ when defined(nimdoc) or (defined(posix) and not defined(nimscript)) or defined(w
     when SupportIoctlInheritCtl:
       result = c_ioctl(f, if inheritable: FIONCLEX else: FIOCLEX) != -1
     elif defined(freertos) or defined(zephyr):
+      result = true
+    elif defined(atari) and defined(libcmini):
+      # libcmini does not have fcntl()
       result = true
     elif defined(posix):
       var flags = fcntl(f, F_GETFD)
