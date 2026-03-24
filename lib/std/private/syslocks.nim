@@ -97,6 +97,33 @@ elif defined(genode):
   proc broadcastSysCond*(cond: var SysCond) {.
     noSideEffect, importcpp.}
 
+elif defined(atari):
+
+  when compileOption("threads"):
+    {.error: "No threading support for Atari platform".}
+
+  type
+    SysLock* = bool
+    SysCond* = object
+
+  proc initSysLock*(L: var SysLock) = discard
+  proc deinitSys*(L: SysLock) = discard
+  proc acquireSys*(L: var SysLock) = L = true
+  proc tryAcquireSys*(L: var SysLock): bool =
+    if not L:
+      L = true
+      return true
+    else:
+      return false
+
+  proc releaseSys*(L: var SysLock) = L = false
+
+  proc initSysCond*(L: var SysCond) = discard
+  proc deinitSysCond*(L: SysCond) = discard
+  proc waitSysCond*(cond: var SysCond, lock: var SysLock) = discard
+  proc signalSysCond*(cond: var SysCond) = discard
+  proc broadcastSysCond*(cond: var SysCond) = discard
+
 else:
   type
     SysLockObj {.importc: "pthread_mutex_t", pure, final,
