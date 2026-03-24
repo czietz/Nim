@@ -244,7 +244,7 @@ elif defined(posix):
 
   type CTime = posix.Time
 
-  when defined(macosx):
+  when defined(macosx) or defined(atari):
     proc gettimeofday(tp: var Timeval, unused: pointer = nil)
       {.importc: "gettimeofday", header: "<sys/time.h>", sideEffect.}
 
@@ -990,7 +990,7 @@ proc getTime*(): Time {.tags: [TimeEffect], gcsafe.} =
       let nanos = convert(Milliseconds, Nanoseconds,
         millis mod convert(Seconds, Milliseconds, 1).int)
       result = initTime(seconds, nanos)
-    elif defined(macosx):
+    elif defined(macosx) or defined(atari):
       var a {.noinit.}: Timeval
       gettimeofday(a)
       result = initTime(a.tv_sec.int64,
@@ -2801,7 +2801,7 @@ proc epochTime*(): float {.tags: [TimeEffect].} =
   ##    use `monotimes.getMonoTime` or `cpuTime` instead, depending on the use case.
   when defined(js):
     result = newDate().getTime() / 1000
-  elif defined(macosx):
+  elif defined(macosx) or defined(atari):
     var a {.noinit.}: Timeval
     gettimeofday(a)
     result = toBiggestFloat(a.tv_sec.int64) + toBiggestFloat(
