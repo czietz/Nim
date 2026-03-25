@@ -448,6 +448,12 @@ when supportedSystem:
       if milsecs < 0:
         return  # fixes #23732
       winlean.sleep(int32(milsecs))
+    elif defined(libcmini):
+      # libcmini only has sleep with 1-second granularity
+      if milsecs < 0:
+        return
+      let rounded = (milsecs + 500) div 1000
+      discard posix.sleep(rounded)
     else:
       var a, b: Timespec = default(Timespec)
       a.tv_sec = posix.Time(milsecs div 1000)
