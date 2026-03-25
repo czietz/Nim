@@ -81,11 +81,19 @@ else:
     else:
       type Time = int
 
-  type
-    Timeval {.importc: "struct timeval", header: "<sys/select.h>",
-               final, pure.} = object ## struct timeval
-      tv_sec: Time  ## Seconds.
-      tv_usec: clong ## Microseconds.
+  when not defined(libcmini):
+    type
+      Timeval {.importc: "struct timeval", header: "<sys/select.h>",
+                 final, pure.} = object ## struct timeval
+        tv_sec: Time  ## Seconds.
+        tv_usec: clong ## Microseconds.
+  else:
+    # libcmini has 'struct timeval' in a non-standard header
+    type
+      Timeval {.importc: "struct timeval", header: "<time.h>",
+                 final, pure.} = object ## struct timeval
+        tv_sec: Time  ## Seconds.
+        tv_usec: clong ## Microseconds.
 
   proc posix_gettimeofday(tp: var Timeval, unused: pointer = nil) {.
     importc: "gettimeofday", header: "<sys/time.h>".}
