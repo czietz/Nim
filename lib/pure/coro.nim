@@ -100,6 +100,8 @@ elif coroBackend == CORO_BACKEND_SETJMP:
     {.compile: "../arch/x86/amd64.S".}
   elif defined(i386):
     {.compile: "../arch/x86/i386.S".}
+  elif defined(atari):
+    {.compile: "../arch/m68k/m68k.S".}
   else:
     # coroExecWithStack is defined in assembly. To support other platforms
     # please provide implementation of this procedure.
@@ -122,8 +124,14 @@ elif coroBackend == CORO_BACKEND_SETJMP:
     proc longjmp(ctx: JmpBuf, ret = 1) {.importc: "narch_$1".}
   else:
     # Use setjmp/longjmp implementation provided by the system.
-    type
-      JmpBuf {.importc: "jmp_buf", header: "<setjmp.h>".} = object
+    when defined(atari):
+      # with mintlib / libcmini, jmp_buf is an array of varying sizes
+      const JmpBufSize {.importc: "sizeof(jmp_buf)", nodecl.} = 0
+      type
+        JmpBuf {.importc: "jmp_buf", header: "<setjmp.h>".} = array[JmpBufSize,uint8]
+    else:
+      type
+        JmpBuf {.importc: "jmp_buf", header: "<setjmp.h>".} = object
 
     proc setjmp(ctx: var JmpBuf): int {.importc, header: "<setjmp.h>".}
     proc longjmp(ctx: JmpBuf, ret = 1) {.importc, header: "<setjmp.h>".}
